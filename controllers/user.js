@@ -3,8 +3,7 @@
 const { response , request } = require('express');
 
 // Imporatacion de models 
- const Usuario = require('../models/Usuario')
-
+ const Usuario = require('../models/usuario');
 
 
 // Controladores de end-points del recurso /usuarios .
