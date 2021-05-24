@@ -1,5 +1,5 @@
 const express = require('express')
-const cors = require('cors');
+var cors = require('cors');
 
 const { dbConnection } = require('../db/config');
 
@@ -20,7 +20,7 @@ class server {
      // cada ruta dispone de endpoints propios , la suma de todos seria los endPoints de RestApi .
      this.userPath = '/api/users';  
      
-    // Conectar a db atlass en nube , es um metodo , se ejecuta antes de lod middelware
+     // Conectar a db atlass en nube , es um metodo , se ejecuta antes de lod middelware
      this.connectarDB();
 
     // Middelwares : son nada mas fuciones que van a añadir otras funcionalida a mi WebServer  
@@ -35,7 +35,7 @@ class server {
      // aqui se implemeta varias conexiones a base de datos diferentes usar una o otra ... 
       await dbConnection(); 
    }
- 
+
    middlewares(){
      // app.use() es los middelware de express ver mas informacion en la doc de express ..
      // Cors , donde configuramos las cabezeras como los dominios que tiene permioso a comunicar a los end-point del Restserver , 
@@ -54,14 +54,14 @@ class server {
 
    } 
 
-    rourtes() { 
+   rourtes() { 
     // middelware : (path , archivo de endpoint a reaccionar depende de metodo http relacionado al path)
     // si se añade el sufijo al dominio el archivo ruta quien reciba los request 
     this.app.use( this.userPath , require('../routes/users'));
 
    
    }
- 
+
    listen() {
 
      this.app.listen(this.port, () => {
