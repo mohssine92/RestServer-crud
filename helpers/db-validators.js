@@ -1,5 +1,5 @@
 const Role = require('../models/role')
-const Usuario = require('../models/Usuario')
+const usuario = require('../models/usuario')
 
 // validacion relacionada a db - utulizada por meddlware 
 const esRoleValido = async(rol = '' ) =>{
@@ -29,7 +29,7 @@ const esRoleValidoUp = async(rol = null ) =>{
 // validacion relacionada a db  utulizada por middlware 
 const emailExiste = async (correo = '') => {
   //verificar si el correo existe , Usuario es el modelo de monggose , nos ofrece varios funciones como tal : 
-  const existeEmail = await Usuario.findOne({ correo });
+  const existeEmail = await usuario.findOne({ correo });
   if ( existeEmail ){
     throw new Error(`El email  ${ correo } ya se encuentra registrado `)   
   }
@@ -38,7 +38,7 @@ const emailExiste = async (correo = '') => {
 const existeUsuarioPorId = async ( id ) => {
 
   // verificar si objeto con este id existe : antes de editar , eleminar 
-  const existeUsuario = await Usuario.findById(id);
+  const existeUsuario = await usuario.findById(id);
   if ( !existeUsuario ) {
       throw new Error(`El id no existe ${ id }`);
       // la logica es si no existe id pues no hay id a actualizar
