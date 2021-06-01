@@ -42,7 +42,11 @@ const UsuarioSchema = Schema({
 
 // Resscribir metodo de monngose asi quito campos que no quiero devolver globalmente 
 UsuarioSchema.methods.toJSON = function() {
-  const { __v, password, ...usuario  } = this.toObject();
+  const { __v, password, _id , ...usuario  } = this.toObject();
+  
+  usuario.uid = _id; 
+  // extraer _id , crear proo nueva uid , asi quiero regresar como uid , video 143
+
   return usuario;
 }
 

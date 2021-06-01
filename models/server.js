@@ -18,7 +18,9 @@ class server {
 
      // declarar rutas aqui sera facil ver todas rutas que dispone ApiRest
      // cada ruta dispone de endpoints propios , la suma de todos seria los endPoints de RestApi .
-     this.userPath = '/api/users';  
+     this.userPath = '/api/users';
+     this.authPath ='/api/auth';
+  
      
      // Conectar a db atlass en nube , es um metodo , se ejecuta antes de lod middelware
      this.connectarDB();
@@ -58,6 +60,7 @@ class server {
     // middelware : (path , archivo de endpoint a reaccionar depende de metodo http relacionado al path)
     // si se añade el sufijo al dominio el archivo ruta quien reciba los request 
     this.app.use( this.userPath , require('../routes/users'));
+    this.app.use( this.authPath, require('../routes/auth'));
 
    
    }

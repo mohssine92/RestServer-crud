@@ -1,8 +1,12 @@
 const { Router }= require('express');
 const { check } = require('express-validator');
-const { validarCampos } = require('../middlewares/validar-campos');
 
-// validacione perzonalizada
+//const { validarCampos } = require('../middlewares/validar-campos');
+//const { validarJWT } = require('../middlewares/validar-jwt');
+//const { tieneRole, RoleAndmismoId, esAdminRole } = require('../middlewares/validar-roles');
+const {validarCampos, validarJWT, tieneRole, RoleAndmismoId, esAdminRole } = require('../middlewares');
+
+// validacione perzonalizadas
 const { esRoleValido,
         emailExiste,
         existeUsuarioPorId,
@@ -17,6 +21,8 @@ const { UsersGet,
 
 
 
+
+
 const router = Router();
 
 
@@ -24,11 +30,12 @@ const router = Router();
 
 
 // le paso Referencia de funcion UserGet , le ejecuta a su tiempo
- router.get('/',[
-  check('limit').custom( veririficIfIsNumber ),   // ver docs 
-  check('desde').custom( veririficIfIsNumber ),
-  validarCampos
- ],  UsersGet) 
+router.get('/',[
+   check('limit').custom( veririficIfIsNumber ),   // ver docs 
+   check('desde').custom( veririficIfIsNumber ),
+   validarCampos
+],  UsersGet) 
+
 
 // '/' => se carga directamente despues del prefix que esta recien configurado 
 // si no configuramos prefix:api , la carga sera directamente despues del dominio  
@@ -52,6 +59,10 @@ const router = Router();
  ],UsersPost)  
 
  router.delete('/:id',[
+   validarJWT,
+   // esAdminRole,
+   tieneRole('ADMIN_ROLE','VENTAS_ROLE'), // ustedes podeis pasar tanto roles necesite este end-point - asi ya sabemos como recibir args en nuestros propios  mdlrs
+   // RoleAndmismoId('ADMIN_ROLE', 'VENTAR_ROLE'),
    check('id', 'No es un ID válido').isMongoId(), // ver docs , id validado es del parametro de roota , no la prop del objeto en este caso  .
    check('id').custom( existeUsuarioPorId ),  // ver docs check('id').custom( existeUsuarioPorId ),  // ver docs
    validarCampos  // acumulador de errores

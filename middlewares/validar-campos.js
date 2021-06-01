@@ -3,7 +3,7 @@ const { validationResult } = require("express-validator");
 
 
 // un middle no es nada que una funcion
-const validarCampos = (req, res, next) => {
+const validarCampos = (req, res, next) => { // conocido como mdlr perzonalizado 
   
   // errores acumulados en req , con los middelware de express-validator , si no se acmular nada pues sera empty
   const errors = validationResult(req);

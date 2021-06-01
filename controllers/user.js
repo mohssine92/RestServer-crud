@@ -128,8 +128,10 @@ const UsersPut = async (req, res = response ) => {
   
 
 const UsersPatch = async (req, res = response ) => { 
-  //console.log(req.params.id) 
+ 
   const { id } = req.params;
+
+ 
 
    // OPCION : 1
    // Fisicamente lo borramos , no es recomendable , luego se nesicita los objetos para hacer analizis para graficas del negocio
@@ -139,8 +141,8 @@ const UsersPatch = async (req, res = response ) => {
    // mientras el modulo que se encarga de activar y desactivar cuentas va jugando con esta props booleana .
    const usuario = await Usuario.findByIdAndUpdate( id, { estado: false } );
 
-
-  res.json( usuario );
+ 
+   res.json({ usuario });
    
 }
 
