@@ -25,6 +25,7 @@ const UsuarioSchema = Schema({
   rol: {
     type: String,
     required: true,
+    default: 'USER_ROLE',
     emun: ['ADMIN_ROLE', 'USER_ROLE'] // role sera uno de los 2 ,  
   },
   estado: {
@@ -37,6 +38,9 @@ const UsuarioSchema = Schema({
   }
 
 })
+
+// TODO : crear una prop boolean interna del modelo , sirve como punto de referancia en desactivar cuenta Temporalmente , asi la misma sera usada en las validacion de los mdlr
+// es decir los servicios de autenticacion y el servicio de pefil seran accesibles y los demas no , mimso user autenticado tendra permiso de activar y desactivar su cuenta .  
 
 
 

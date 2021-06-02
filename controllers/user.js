@@ -17,7 +17,7 @@ const UsersGet = async (req = request, res = response ) => {
   // const {q , apiKey , name = 'No-name', page=1 , limit} = req.query;
 
   // los queries son argumentos de los Segmento url .-
-  const { limit= 5, desde } = req.query;
+  const { limit= 100, desde } = req.query;
   // condicion en la consulta , filtro , true = existe , estado = false user fue borrado . 
   const query = {estado: true};
 

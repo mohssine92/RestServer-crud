@@ -5,6 +5,7 @@ const bcryptjs = require('bcryptjs')
 const Usuario = require('../models/usuario');
 
 const { generarJWT } = require('../helpers/generar-jwt');
+const { googleVerify } = require('../helpers/google-verify');
 
 
 const login = async (req, res = response) => {
@@ -71,8 +72,74 @@ const login = async (req, res = response) => {
 
 }
 
+const googleSignin = async(req, res = response) => {
+   
+  const { id_token } = req.body; 
+ 
+
+  
+  try {
+    //  const { correo, nombre, img } = await googleVerify( id_token );
+
+    //  let usuario = await Usuario.findOne({ correo });
+
+    const { correo, nombre, img } = await googleVerify( id_token );
+   
+
+    /* ahora me toca crear el proceso de auteticacion en mi DB , porque se si llego a este punto el usuario de goole fue verificado correctamente , este proceso de db 
+      sera el mismo para los demas Apis como youtube , githb etc .. lo unico que se va cambiando son los helpers y lo del frond-end(pasarme id_token en este caso de google para
+      verificarlo en helper) donde  voy a implementar cada logica  de verificancion de tokenz del api de auth que quiero permitir en mi back end como forma de autenticacion - . */  
+    let usuario = await Usuario.findOne({ correo });
+     
+      if (! usuario ) {
+
+        // console.log(usuario, 'usuario no existe en db ');
+        // Tengo que crearlo
+        const data = {
+            nombre,
+            correo,
+            password: 'auth-api-etern', // es requerido en nuestro modelo 
+            img,
+            google: true
+        }; // recordar las props internas de data deben ser igual al modelo paraque se caen encima y se registra el objeto correctamente .
+
+        usuario = new Usuario( data );
+        await usuario.save(); 
+       
+     } 
+
+    // Si el usuario en DB 
+    if ( !usuario.estado ) { // false
+      return res.status(401).json({
+          msg: 'Hable con el administrador, usuario bloqueado'
+      });
+    }
+
+    // Generar el JWT - a esta altuta user deberia existir o se acaba de generarse , asi si o si debemos tener id de monggose para almacenarlo en jwt :D 
+    const token = await generarJWT( usuario.id );
+    console.log(token)
+    res.json({
+      usuario,
+      token
+    });
+
+   
+      
+} catch (error) {
+
+  res.status(400).json({
+      msg: 'Token de Google no es válido'
+  })
+
+}
+
+
+
+}
+
 
 
 module.exports = {
-    login
+    login,
+    googleSignin
 }

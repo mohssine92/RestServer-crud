@@ -7,7 +7,7 @@ const Usuario = require('../models/usuario');
 const validarJWT = async( req = request, res = response, next ) => {  // res = response para tener el tipado tener ayuda al escribir
  
     const token = req.header('x-token'); // console.log(token);
- 
+    
     if ( !token ) {  // primer o verificar si llega el token 
         return res.status(401).json({
             msg: 'No hay token en la petición'
