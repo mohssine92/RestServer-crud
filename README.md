@@ -6,3 +6,4 @@
          :   heroku logs -n 100  => ver los ultimos logs en el servidor de heroku . 
          :   heroku logs -n 100 --tail => mantener los logs en vivo .
 # autenticaion con google integrada
+https://desarrolloweb.com/articulos/especificar-versiones-git-tag.html  : tags 

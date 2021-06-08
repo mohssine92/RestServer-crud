@@ -44,12 +44,12 @@ const UsuarioSchema = Schema({
 
 
 
-// Resscribir metodo de monngose asi quito campos que no quiero devolver globalmente 
+// Reecribir metodo de monngose asi quito campos que no quiero devolver globalmente y renombrar , y quitar las prop internas del objeto que no me interesa que van como salida a los servicios relacionados es este modelo
 UsuarioSchema.methods.toJSON = function() {
   const { __v, password, _id , ...usuario  } = this.toObject();
   
   usuario.uid = _id; 
-  // extraer _id , crear proo nueva uid , asi quiero regresar como uid , video 143
+  // extraer _id , crear proo nueva uid , asi quiero regresar como uid en el objeto, video 143
 
   return usuario;
 }

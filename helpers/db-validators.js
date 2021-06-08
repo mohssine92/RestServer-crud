@@ -1,5 +1,4 @@
-const Role = require('../models/role')
-const usuario = require('../models/usuario')
+const { Usuario , Role , Categoria } = require('../models')
 
 // validacion relacionada a db - utulizada por meddlware 
 const esRoleValido = async(rol = '' ) =>{
@@ -29,7 +28,7 @@ const esRoleValidoUp = async(rol = null ) =>{
 // validacion relacionada a db  utulizada por middlware 
 const emailExiste = async (correo = '') => {
   //verificar si el correo existe , Usuario es el modelo de monggose , nos ofrece varios funciones como tal : 
-  const existeEmail = await usuario.findOne({ correo });
+  const existeEmail = await Usuario.findOne({ correo });
   if ( existeEmail ){
     throw new Error(`El email  ${ correo } ya se encuentra registrado `)   
   }
@@ -38,7 +37,7 @@ const emailExiste = async (correo = '') => {
 const existeUsuarioPorId = async ( id ) => {
 
   // verificar si objeto con este id existe : antes de editar , eleminar 
-  const existeUsuario = await usuario.findById(id);
+  const existeUsuario = await Usuario.findById(id);
   if ( !existeUsuario ) {
       throw new Error(`El id no existe ${ id }`);
       // la logica es si no existe id pues no hay id a actualizar
@@ -75,6 +74,27 @@ const veririficIfIsNumber = async ( limit ) => {
 
 
 
+/**
+ * Categorias 
+ *  esta funccion se llama en los mdlrs , verifica si el id del objeto categoria existe relmente , si no dispara un error
+ * en general la puede usar para verificar id de cual quier objeto voy a procesar
+ * id captado en el param del url en este caso
+ * yo no puedo dejar un id que no exista llegar hast el controller donde va hacer consulta y returna undefined , la app se va caer . por eso existe esta validacion
+ */
+ const existeCategoriaPorId = async( id ) => {
+ 
+  // Verificar si el categoria -correo : existe
+  const existeCategoria = await Categoria.findById(id);
+ //  console.log( existeCategoria)
+  if ( !existeCategoria ) {
+      throw new Error(`El id no existe ${ id }`);
+  }
+}
+
+ 
+
+
+
 
 
 module.exports = {
@@ -82,7 +102,8 @@ module.exports = {
  emailExiste,
  existeUsuarioPorId,
  esRoleValidoUp,
- veririficIfIsNumber
+ veririficIfIsNumber,
+ existeCategoriaPorId
  
 }
 
