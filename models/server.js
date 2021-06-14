@@ -21,9 +21,9 @@ class Server {
        cada ruta dispone de endpoints propios , la suma de todos seria los endPoints de RestApi */
     this.paths = {
       auth:       '/api/auth',
-      // buscar:     '/api/buscar',
+      buscar:     '/api/buscar',
       categorias: '/api/categorias',
-     // productos:  '/api/productos',
+      productos:  '/api/productos',
       usuarios:   '/api/users',
     }
   
@@ -64,8 +64,10 @@ class Server {
    routes() { 
      /* middelware de express , definimos un archivo de routas/servicios/endpoints por cada ruta entrante .*/
     this.app.use( this.paths.usuarios, require('../routes/users'));
+    this.app.use( this.paths.buscar, require('../routes/buscar'));
     this.app.use( this.paths.auth, require('../routes/auth'));
     this.app.use( this.paths.categorias, require('../routes/categorias'));  
+    this.app.use( this.paths.productos, require('../routes/productos')); 
 
    }
 

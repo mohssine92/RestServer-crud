@@ -42,8 +42,8 @@ const obtenerCategoria = async(req, res = response ) => {
  
     const { id } = req.params;
     const categoria = await Categoria.findById( id )
-                                     .populate('usuario', 'nombre'); 
-
+                                     .populate('usuario', ['nombre']); 
+    //TODO: falta un filtro en la consulta no puedo returnar objeto categoria con estado false , dejo aver porque el profesor no lo ha pueto asi
                                 
   /* en caso quiero manipular el onjarto y quiero devolver solo el nombre de user el que crea la categoria :pero en este caso returno tanto id como nobre del user .. dentro del objeto categoria */
    // const {_id, nombre, usuario } = categoria;
@@ -98,34 +98,40 @@ const crearCategoria = async(req = request , res = response ) => {
 
 
 const actualizarCategoria = async( req, res = response ) => {
+ 
+  
+  const { id } = req.params; // id del objeto a actualizar - para recibir de esta manera requiere configuracion en la ruta 
+  //console.log(id)
+   
+ 
+  const { estado, usuario, ...data } = req.body; // extraer las props que no necesito en este procidimiento ,
+  //console.log(data, req.body);
 
-    /* const { id } = req.params;
-    const { estado, usuario, ...data } = req.body;
+  data.nombre  = data.nombre.toUpperCase(); // solo cuando quiero almacenar en mayuscula 
+    
+   // en esta logica segun hay diferentes ids users que pueden hacer la modificacion , asi voy a guardar id del ultimo user que hizo la modificacion - usando id del dueño del token de autenticacion 
+   data.usuario = req.usuario._id;   //console.log(data.usuario)
 
-    data.nombre  = data.nombre.toUpperCase();
-    data.usuario = req.usuario._id;
+  const categoria = await Categoria.findByIdAndUpdate(id, data, { new: true });  //{ new: true } : paraque responde con el documento actualizado:new version , no el documento que se va a actualizar
 
-    const categoria = await Categoria.findByIdAndUpdate(id, data, { new: true });
-
-    res.json( categoria );
- */
 
     res.json({
-        ok: "update ha respondiodo "
-    });
+      categoria // se espera que devuelve documento actualizado como respuesta
+       
+    }); 
 }
 
 
 const borrarCategoria = async(req, res =response ) => {
 
-   /*  const { id } = req.params;
+    const { id } = req.params; 
+
+    /* por favor  recordan no vamos a borrar , solo cambiar de estado porque al memento de getear los objetos filtro los que sus estados es false no se devuelven en res*/
     const categoriaBorrada = await Categoria.findByIdAndUpdate( id, { estado: false }, {new: true });
 
     res.json( categoriaBorrada );
- */
-    res.json({
-        ok: "borrar ha respomndido"
-    });
+
+
 }
 
 

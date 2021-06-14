@@ -4,6 +4,7 @@ const { response,  request } = require('express')
 const esAdminRole = ( req, res = response, next ) => {
  // permite solo al administrador
 
+    // req.usario : se asigna en el mdlt de jwt
     if ( !req.usuario ) {
         return res.status(500).json({ // 500 falla algo en mi codigo
             msg: 'Se quiere verificar el role sin validar el token primero'

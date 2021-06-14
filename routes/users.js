@@ -39,6 +39,7 @@ router.get('/',[
 
 // '/' => se carga directamente despues del prefix que esta recien configurado 
 // si no configuramos prefix:api , la carga sera directamente despues del dominio  
+// TODO: para actualizar user , necesitamos crear un servicio para el cliente donde respondemos con objeto de cliente auteticado
  router.put('/:id',[
     check('id', 'No es un ID válido').isMongoId(), // ver docs , id validado es del parametro de roota , no la prop del objeto en este caso  .
     check('id').custom( existeUsuarioPorId ),  // ver docs

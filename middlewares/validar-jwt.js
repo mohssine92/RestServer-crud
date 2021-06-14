@@ -42,7 +42,7 @@ const validarJWT = async( req = request, res = response, next ) => {  // res = r
       
       
         // lo que estoy haciendo aqui simplemente , como el objeto req viene viajando desde el cliente hacia el controller , aproveche y le asigne nueva prop interna . obviamente este objeto va pasando por los middlr .
-        req.usuario = usuario;
+        req.usuario = usuario; // console.log(req)
 
 
         next();
