@@ -1,5 +1,6 @@
 const express = require('express')
 var cors = require('cors');
+const fileUpload = require('express-fileupload');
 
 const { dbConnection } = require('../db/config');
 
@@ -17,21 +18,22 @@ class Server {
      this.app = express();   
      this.port = process.env.PORT;
 
-    /* Definir rutas ApiRest en el servidor , sino la defino no estara reconocida por mi servidore 
-       cada ruta dispone de endpoints propios , la suma de todos seria los endPoints de RestApi */
+    /* Definir urls ApiRest en el servidor de node , sino la defino no estara reconocida por mi servidore 
+       cada ruta dispone de endpoints propios = archivos de routes , la suma de todos seria los endPoints de RestApi */
     this.paths = {
       auth:       '/api/auth',
       buscar:     '/api/buscar',
       categorias: '/api/categorias',
       productos:  '/api/productos',
       usuarios:   '/api/users',
+      uploads:    '/api/uploads',
     }
   
      
      // Conectar a db atlass en nube , es um metodo , se ejecuta antes de lod middelware
      this.connectarDB();
 
-    // Middelwares : son nada mas fuciones que van a añadir otras funcionalida a mi WebServer  
+    // Middelwares : funciones a nivel del servidor de express  : se ejecutan antes de llegar a las rutas
      this.middlewares();
 
     // Rutas de mi aplicacion 
@@ -44,30 +46,44 @@ class Server {
       await dbConnection(); 
    }
 
+   /* aqui tenemos agrupados lo que son mdlrs a nivel de servidor */
    middlewares(){
      // app.use() es los middelware de express ver mas informacion en la doc de express ..
-     // Cors , donde configuramos las cabezeras como los dominios que tiene permioso a comunicar a los end-point del Restserver , 
-     // Rest-server pudede ser publica , o solo para algunos clientes etc...hay varios escenarios que pudede configura
+     // Cors , donde configuramos las cabezeras como los origines que tiene permioso a comunicar a los end-points del Restserver , 
+     // Rest-server pude ser publica , o solo para algunosorigenes ...hay varios escenarios que pudede configura
      this.app.use( cors() );
 
-     /* Lectura y parseo del body disparado por Origen o navigador o postman por cliente  hacia todos nuestrs end-points en esta configuracion 
-      Ex : un formulario dispara su post en este especifico punto codificamos valor req en formato json , en objeto json literal  */
+     /* Lectura y parseo del body disparado por Origen o navigador o postman por cliente  hacia todos nuestros end-points en esta configuracion 
+      Ex : un formulario dispara su post en este especifico punto codificamos valor req.body en formato json , en objeto json literal - apto a manipular en js  */
      this.app.use( express.json() );   
   
   
     //http://localhost:8080 - pagina statica a cargar en el dominio - express funcion paquete 
-    this.app.use(express.static('public'));
+     this.app.use(express.static('public'));
+
+     /* FileUpload - carga de archivos  - video:182 para cualquier duda 
+      * puede ser cualquier tipo de  archivo - aqui no es el luguar donde estoy especificando que tiene que ser img o excel ....
+     */
+     this.app.use ( fileUpload({
+       useTempFiles : true,
+       tempFileDir : '/tmp/',
+       createParentPath : true, // POR DEFAULT ES FALSE
+
+     }));
+
 
 
    } 
 
    routes() { 
-     /* middelware de express , definimos un archivo de routas/servicios/endpoints por cada ruta entrante .*/
+     /* middelware de express , segun this.paths entrante se require  el archivo de rutas : verbos http relacionado */
     this.app.use( this.paths.usuarios, require('../routes/users'));
     this.app.use( this.paths.buscar, require('../routes/buscar'));
     this.app.use( this.paths.auth, require('../routes/auth'));
     this.app.use( this.paths.categorias, require('../routes/categorias'));  
     this.app.use( this.paths.productos, require('../routes/productos')); 
+    this.app.use( this.paths.uploads, require('../routes/uploads'));
+
 
    }
 

@@ -122,6 +122,23 @@ const existeProductoConEsteNombre = async( nombre , idProducto  ) => {
  }
  */
 }
+
+
+
+/**
+ * Validar colecciones permitidas
+ * recibe coleccion por params y colecciones que permitimos 
+ * si lo hubiera validado como mdlrs , tenia que implementar req , res , next resuelta mas configuracion , asi en helpres con funcion normal me sale mas simple la validacion  
+ */
+const coleccionesPermitidas = ( coleccion = '', colecciones = []) => {
+
+  const incluida = colecciones.includes( coleccion );
+  if ( !incluida ) {
+      throw new Error(`This collection ${ coleccion } is not allowed , please send one of these collections [ ${ colecciones } ]`);
+  } // al lanzar throw no va continuar y va chocar alli 
+  
+  return true;
+} // colecciones siempre van a estar definidas , coleccion debemos pasarla nosotros
  
 
 
@@ -136,7 +153,8 @@ module.exports = {
  veririficIfIsNumber,
  existeCategoriaPorId,
  existeProductoPorId,
- existeProductoConEsteNombre
+ existeProductoConEsteNombre,
+ coleccionesPermitidas
  
 }
 

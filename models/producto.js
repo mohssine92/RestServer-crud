@@ -27,6 +27,7 @@ const ProductoSchema = Schema({
     },
     descripcion: { type: String },
     disponible: { type: Boolean, defult: true }, // si esta false no segnifica que esta eleminado , segnifica que no tengo en el stock o el servicio producto no esta disponible por el memento o use un producto por temporada
+    img:{ type: String }, // la acabo de añadir y ya , ahora le puedo asignar img al producto 
 });
 
 
