@@ -46,8 +46,35 @@ const subirArchivo = ( files,  extensionesValidas = ['png','jpg','jpeg','gif'] ,
 
 }
 
+const verificarExtension = ( files,  extensionesValidas = ['png','jpg','jpeg','gif'] ) => {
+
+     return new Promise( (resolve, reject) => {
+
+          // Obtener extension del archivo a subir 
+          const { archivo } = files;  console.log('nombre de archivo recibido',archivo.name );
+          const nombreCortado = archivo.name.split('.');
+          const extension = nombreCortado[ nombreCortado.length - 1 ];  
+         
+
+         // validar extenciones validas 
+          if( !extensionesValidas.includes( extension )){ 
+             return reject( `the extension ${ extension } is not valid - valid extensions is : ${ extensionesValidas }`);
+          } // reject se implementa cuando no salo lo que se esperaba , se recibe en un catch al llamar esta promesa
+
+         
+         return resolve( true ); 
+
+       
+    
+     }); 
+  
+    
+  
+}
+
 
 
 module.exports = {
-    subirArchivo
+    subirArchivo,
+    verificarExtension
 }

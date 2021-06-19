@@ -3,7 +3,7 @@ const path = require('path');
 
 
 const { response , request } = require('express'); // asi tengo el tipado es totalmente opcional
-const { subirArchivo } = require('../helpers');  // index
+const { subirArchivo ,  verificarExtension } = require('../helpers');  // index
 
 //194 fh 
 var cloudinary = require('cloudinary').v2 // => objeto de cloudinary
@@ -51,65 +51,68 @@ const cargarArchivo = async(req = request , res = response) => {
 */
 const actualizarImagen = async(req, res = response ) => {
 
-    const { id, coleccion } = req.params;   // /:collecion/:id
-    //console.log(req.files.archivo)
-
+    try {
     
-    // Verificar la existencia del id en la coleccion , la logica si el id no existe pues no haya nada que actualizar -couper 
-
-    let modelo;  // la declaro porque voy a establecer su valor de forma condicional
-    
-    switch ( coleccion ) {
-
-        case 'usuarios': // coleccion permitida
-            modelo = await Usuario.findById(id);
-            if ( !modelo ) {
-                return res.status(400).json({
-                    msg: `Does not exist User whit this id : ${ id } in this collection `
-                });
-            }
+     const { id, coleccion } = req.params;   // /:collecion/:id
+        //console.log(req.files.archivo)
         
-        break;
-
-        case 'productos':  // coleccion permitida
-            modelo = await Producto.findById(id);
-            if ( !modelo ) {
-                return res.status(400).json({
-                    msg: `Does not exist Product whit this id : ${ id } in this collection`
-                });
-            }
+        // Verificar la existencia del id en la coleccion , la logica si el id no existe pues no haya nada que actualizar -couper 
+    
+        let modelo;  // la declaro porque voy a establecer su valor de forma condicional
+    
+        switch ( coleccion ) {
+    
+            case 'usuarios': // coleccion permitida
+                modelo = await Usuario.findById(id);
+                if ( !modelo ) {
+                    return res.status(400).json({
+                        msg: `Does not exist User whit this id : ${ id } in this collection `
+                    });
+                }
+            
+            break;
+    
+            case 'productos':  // coleccion permitida
+                modelo = await Producto.findById(id);
+                if ( !modelo ) {
+                    return res.status(400).json({
+                        msg: `Does not exist Product whit this id : ${ id } in this collection`
+                    });
+                }
+            
+            break;
         
-        break;
+            default:
+                return res.status(500).json({ msg: 'I forgot to validate this'}); // 500 es error mio
+        } 
     
-        default:
-            return res.status(500).json({ msg: 'I forgot to validate this'}); // 500 es error mio
-    } 
+        // ahora se que tanto modelo usuarios como productos tienen una prop que es img 
+        // y tambien si la prop img tiene valor es el momento correcto de borrar dicho valor desde file system antes de hacer nueva subida + actualizacion en db .  
     
-    // ahora se que tanto modelo usuarios como productos tienen una prop que es img 
-    // y tambien si la prop img tiene valor es el momento correcto de borrar dicho valor desde file system antes de hacer nueva subida + actualizacion en db .  
-
- 
-    // Limpiar imágenes previas basura - Borrar el archivo del servidor 
-     if ( modelo.img ) {
-        // Hay que borrar la imagen del servidor porque en db se actualiza , asi la anteriror no tiene porque sigua en servidor de node 
-        const pathImagen = path.join( __dirname, '../uploads', coleccion, modelo.img );
-        if ( fs.existsSync( pathImagen ) ) { // pregunto si existe , regresa un true : yaque puede que haya sido eleminado
-             fs.unlinkSync( pathImagen ); // en caso de existir a borra - paraque enseguida sera nueva subida segun proceso de este servicio
-        }
-    }  // una nota : mientras menos archivos tenemos en la carpeta , mas rapido su lectura va ser ,
+     
+        // Limpiar imágenes previas basura - Borrar el archivo del servidor 
+         if ( modelo.img ) {
+            // Hay que borrar la imagen del servidor porque en db se actualiza , asi la anteriror no tiene porque sigua en servidor de node 
+            const pathImagen = path.join( __dirname, '../uploads', coleccion, modelo.img );
+            if ( fs.existsSync( pathImagen ) ) { // pregunto si existe , regresa un true : yaque puede que haya sido eleminado
+                 fs.unlinkSync( pathImagen ); // en caso de existir a borra - paraque enseguida sera nueva subida segun proceso de este servicio
+            }
+        }  // una nota : mientras menos archivos tenemos en la carpeta , mas rapido su lectura va ser ,
   
 
-   const nombre = await subirArchivo( req.files, undefined, coleccion ); // 3 arg es nombre de la carpeta desde uploads - la idea crear carpeta de archivos depende de la coleccion - si trato de pdf : creo otro endpoint y yasta
-   modelo.img = nombre; // nombre es depende del return de subirArvhivo , segun hemos implementado : va ser nuevo nombre de la imagen , para proyectos grandes podemos crear carpetas con colecciones concatenamos fetchas del mes y año 
-
-  /* Guardar en DB
-     como modelo sigue siendo instancia de algun modelo recien instanciado acabamos con save .: */
-     await modelo.save();
-
-
-    res.json( modelo );
+         const nombre = await subirArchivo( req.files, undefined, coleccion ); // 3 arg es nombre de la carpeta desde uploads - la idea crear carpeta de archivos depende de la coleccion - si trato de pdf : creo otro endpoint y yasta
+         modelo.img = nombre; // nombre es depende del return de subirArvhivo , segun hemos implementado : va ser nuevo nombre de la imagen , para proyectos grandes podemos crear carpetas con colecciones concatenamos fetchas del mes y año 
+      
+        /* Guardar en DB
+           como modelo sigue siendo instancia de algun modelo recien instanciado acabamos con save .: */
+           await modelo.save();
+      
+      
+          res.json( modelo );
    
-
+    } catch (msgErr) {
+         res.status(400).json({ msgErr });
+    } // catch - msgErr : para recibir emission de reject()
 }
 
 /* 
@@ -117,57 +120,71 @@ const actualizarImagen = async(req, res = response ) => {
 */
 const actualizarImagenCloudinary = async(req, res = response ) => {
 
-    const { id, coleccion } = req.params;
+   try{
+      
+      const { id, coleccion } = req.params;
 
-    let modelo;
+      let modelo;
 
-    switch ( coleccion ) {
-        case 'usuarios':
-            modelo = await Usuario.findById(id);
-            if ( !modelo ) {
-                return res.status(400).json({
-                    msg: `No existe un usuario con el id ${ id }`
-                });
-            }
-        
-        break;
+      switch ( coleccion ) {
+          case 'usuarios':
+              modelo = await Usuario.findById(id);
+              if ( !modelo ) {
+                  return res.status(400).json({
+                      msg: `No existe un usuario con el id ${ id }`
+                  });
+              }
+          
+          break;
+  
+          case 'productos':
+              modelo = await Producto.findById(id);
+              if ( !modelo ) {
+                  return res.status(400).json({
+                      msg: `No existe un producto con el id ${ id }`
+                  });
+              }
+          
+          break;
+      
+          default:
+              return res.status(500).json({ msg: 'Se me olvidó validar esto'});
+      }
 
-        case 'productos':
-            modelo = await Producto.findById(id);
-            if ( !modelo ) {
-                return res.status(400).json({
-                    msg: `No existe un producto con el id ${ id }`
-                });
-            }
-        
-        break;
-    
-        default:
-            return res.status(500).json({ msg: 'Se me olvidó validar esto'});
-    }
 
+       // Verificacion de extensiones 
+       const valid = await verificarExtension(req.files);
+       console.log(valid);
 
-    // Limpiar imágenes previas
-    if ( modelo.img ) {  // tener en cuenta que modelo es una instancia un modeloMonggose de mi back-end iniciada . 
-        const nombreArr = modelo.img.split('/');
-        const nombre    = nombreArr[ nombreArr.length - 1 ]; // nicesito ultimo posicion
-        const [ public_id ] = nombre.split('.');  // array -> desestructuracion de array -> doy nombre qu quiero 
-        cloudinary.uploader.destroy( public_id );  console.log('a borrar',public_id ); //  public_id => es lo que necesito para eleminar archivo desde el servicio cloudinary 
-    }   
+  
+      // Limpiar imágenes previas
+      if ( modelo.img ) {  // tener en cuenta que modelo es una instancia un modeloMonggose de mi back-end iniciada . 
+          const nombreArr = modelo.img.split('/');
+          const nombre    = nombreArr[ nombreArr.length - 1 ]; // nicesito ultimo posicion
+          const [ public_id ] = nombre.split('.');  // array -> desestructuracion de array -> doy nombre qu quiero 
+          cloudinary.uploader.destroy( public_id );  console.log('a borrar',public_id ); //  public_id => es lo que necesito para eleminar archivo desde el servicio cloudinary 
+      }   
  
-    /* en la prop extraeda es una path donde se encuentra mi archvo almacenado temporalmente -asi paso de almacenarlo temporalmente de mi servidor de node 
-     *  asi paso el path temporal al servico de cloudynary
-    */
-    const { tempFilePath } = req.files.archivo;  console.log(req.files.archivo)
-    const { secure_url } = await cloudinary.uploader.upload( tempFilePath ); // hay muchas cosas que puede subir : pasa a upload()
-    modelo.img = secure_url; // asignacion de prop en el objeto del modelo 
+       /* en la prop extraeda es una path donde se encuentra mi archvo almacenado temporalmente -asi paso de almacenarlo temporalmente de mi servidor de node 
+        *  asi paso el path temporal al servico de cloudynary
+       */
+       const { tempFilePath } = req.files.archivo;  console.log(req.files.archivo)
+       const { secure_url } = await cloudinary.uploader.upload( tempFilePath ); // hay muchas cosas que puede subir : pasa a upload()
+       modelo.img = secure_url; // asignacion de prop en el objeto del modelo 
+   
+       await modelo.save(); // guardar en db que es otro servico externo de mongo atlass 
 
-    await modelo.save(); // guardar en db que es otro servico externo de mongo atlass 
 
+       res.json( modelo );
 
-    res.json( modelo );
+  } catch (msgErr) {
+     res.status(400).json({ msgErr });
+  }   // catch - msgErr : para recibir emission de reject()
 
 }
+
+
+
 const mostrarImagenCloudinary = async(req, res = response ) => {
 
     // utl params /:coleccion/:id etc ... 
